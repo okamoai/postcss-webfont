@@ -181,15 +181,13 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
 
   // append base ruleset
   const selectors = [
-    `[class^='${options.classNamePrefix}-${iconFont.fontName}-']::before`,
-    `[class*=' ${options.classNamePrefix}-${iconFont.fontName}-']::before`,
+    `[class*='${options.classNamePrefix}${options.classNameFontSeparator}${iconFont.fontName}']::before`,
   ];
 
   if (options.classNameBeforePrefix) {
 
     selectors.push(
-      `[class^='${options.classNameBeforePrefix}-${iconFont.fontName}-']::before`,
-      `[class*=' ${options.classNameBeforePrefix}-${iconFont.fontName}-']::before`,
+      `[class*='${options.classNameBeforePrefix}${options.classNameFontSeparator}${iconFont.fontName}']::before`,
     );
 
   }
@@ -197,8 +195,7 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
   if (options.classNameAfterPrefix) {
 
     selectors.push(
-      `[class^='${options.classNameAfterPrefix}-${iconFont.fontName}-']::after`,
-      `[class*=' ${options.classNameAfterPrefix}-${iconFont.fontName}-']::after`,
+      `[class*='${options.classNameAfterPrefix}${options.classNameFontSeparator}${iconFont.fontName}']::after`,
     );
 
   }
@@ -250,17 +247,25 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
   // append glyphs
   glyphs.forEach((glyph) => {
 
-    const glyphSelectors = [`.${options.classNamePrefix}-${iconFont.fontName}-${glyph.name}::before`];
+    const {
+      classNamePrefix: prefix,
+      classNameBeforePrefix: beforePrefix,
+      classNameAfterPrefix: afterPrefix,
+      classNameFontSeparator: fontSeparator,
+      classNameGlyphSeparator: glyphSeparator
+    } = options;
 
-    if (options.classNameBeforePrefix) {
+    const glyphSelectors = [`.${prefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::before`];
 
-      glyphSelectors.push(`.${options.classNameBeforePrefix}-${iconFont.fontName}-${glyph.name}::before`);
+    if (beforePrefix) {
+
+      glyphSelectors.push(`.${beforePrefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::before`);
 
     }
 
-    if (options.classNameAfterPrefix) {
+    if (afterPrefix) {
 
-      glyphSelectors.push(`.${options.classNameAfterPrefix}-${iconFont.fontName}-${glyph.name}::after`);
+      glyphSelectors.push(`.${afterPrefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::after`);
 
     }
 

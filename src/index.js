@@ -17,8 +17,9 @@ const defaultOptions = {
   verticalAlign: 'middle',
   classNamePrefix: 'iconfont',
   classNameBeforePrefix: 'iconfont-before',
-  classNameAfterPrefix: 'iconfont-after'
-
+  classNameAfterPrefix: 'iconfont-after',
+  classNameFontSeparator: '-',
+  classNameGlyphSeparator: '-',
 };
 
 module.exports = postcss.plugin('postcss-webfont', (options) => {
