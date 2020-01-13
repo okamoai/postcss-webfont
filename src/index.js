@@ -13,13 +13,15 @@ const defaultOptions = {
   stylesheetPath: './',
   cachePath: '.fontcache.json',
   startUnicode: 0xEA01,
+  prependUnicode: false,
   formats: ['eot', 'woff', 'ttf'],
   verticalAlign: 'middle',
   classNamePrefix: 'iconfont',
-  classNameBeforePrefix: 'iconfont-before',
-  classNameAfterPrefix: 'iconfont-after',
-  classNameFontSeparator: '-',
-  classNameGlyphSeparator: '-',
+  classNamePrefixBefore: 'before',
+  classNamePrefixAfter: 'after',
+  cachebuster: 'hash',
+  cachebusterFixed: '',
+
 };
 
 module.exports = postcss.plugin('postcss-webfont', (options) => {

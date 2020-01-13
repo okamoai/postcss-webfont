@@ -11,12 +11,24 @@ const fontGenerator     = require('./font_generator');
 // Templates src property by font type
 const srcPropertyTemplates = {
 
-  eotIE: 'url(\'{fontPath}.eot?{fontHash}\')',
-  eot: 'url(\'{fontPath}.eot?{fontHash}#iefix\') format(\'embedded-opentype\')',
-  woff2: 'url(\'{fontPath}.woff2?{fontHash}\') format(\'woff2\')',
-  woff: 'url(\'{fontPath}.woff?{fontHash}\') format(\'woff\')',
-  ttf: 'url(\'{fontPath}.ttf?{fontHash}\') format(\'truetype\')',
-  svg: 'url(\'{fontPath}.svg?{fontHash}#${fontName}\') format(\'svg\')',
+  eotIE: 'url(\'{fontPath}.eot{fontHash}\')',
+  eot: 'url(\'{fontPath}.eot{fontHash}#iefix\') format(\'embedded-opentype\')',
+  woff2: 'url(\'{fontPath}.woff2{fontHash}\') format(\'woff2\')',
+  woff: 'url(\'{fontPath}.woff{fontHash}\') format(\'woff\')',
+  ttf: 'url(\'{fontPath}.ttf{fontHash}\') format(\'truetype\')',
+  svg: 'url(\'{fontPath}.svg{fontHash}#${fontName}\') format(\'svg\')',
+
+};
+
+
+/**
+ * Get template font hash string.
+ *
+ * @param {string} fontHash use fontHash
+ */
+const getTemplateFontHash = (fontHash) => {
+
+  return fontHash ? `?${fontHash}` : '';
 
 };
 
@@ -66,6 +78,7 @@ const createFonts = (iconFont, rulesets, options) => {
         fixedWidth: options.fixedWidth,
         fixedHash: options.fixedHash,
         startUnicode: options.startUnicode,
+        prependUnicode: options.prependUnicode,
       }
     }).then((glyphs) => {
 
@@ -109,7 +122,7 @@ const createFontFaceSrcProperty = (iconFont, options) => {
 
       srcFormats.push(stringTemplate(template, {
         fontPath,
-        fontHash: iconFont.fontHash,
+        fontHash: getTemplateFontHash(iconFont.fontHash),
         fontName: iconFont.fontName
       }));
 
@@ -141,7 +154,7 @@ const createFontFaceSrcPropertyWithEOT = (iconFont, options) => {
   // returns src property
   return stringTemplate(srcPropertyTemplates.eotIE, {
     fontPath,
-    fontHash: iconFont.fontHash,
+    fontHash: getTemplateFontHash(iconFont.fontHash),
     fontName: iconFont.fontName
   });
 
@@ -150,10 +163,10 @@ const createFontFaceSrcPropertyWithEOT = (iconFont, options) => {
 /**
  * Creates rulesets of web font.
  *
- * @param {string}  iconFont  target icon font.
- * @param {object}  rulesets  Rulesets of PostCSS object.
- * @param {array}   glyphs    glyphs of web fonts.
- * @param {object}  options   generating font options.
+ * @param {string}  iconFont    target icon font.
+ * @param {object}  rulesets    Rulesets of PostCSS object.
+ * @param {object}  glyphs      glyphs of web font.
+ * @param {object}  options     generating font options.
  */
 const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
 
@@ -179,29 +192,22 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
 
   }
 
+  // creates class prefix names
+  const useClassNamePrefix = options.classNamePrefix ? `${options.classNamePrefix}-` : '';
+  const useClassNamePrefixBefore = options.classNamePrefixBefore ? `${options.classNamePrefixBefore}-` : '';
+  const useClassNamePrefixAfter = options.classNamePrefixAfter ? `${options.classNamePrefixAfter}-` : '';
+
   // append base ruleset
-  const selectors = [
-    `[class*='${options.classNamePrefix}${options.classNameFontSeparator}${iconFont.fontName}']::before`,
-  ];
-
-  if (options.classNameBeforePrefix) {
-
-    selectors.push(
-      `[class*='${options.classNameBeforePrefix}${options.classNameFontSeparator}${iconFont.fontName}']::before`,
-    );
-
-  }
-
-  if (options.classNameAfterPrefix) {
-
-    selectors.push(
-      `[class*='${options.classNameAfterPrefix}${options.classNameFontSeparator}${iconFont.fontName}']::after`,
-    );
-
-  }
-
-  const iconRule = postcss.rule({ selectors });
-
+  const iconRule = postcss.rule({
+    selectors: [
+      `[class^='${useClassNamePrefix}${iconFont.fontName}-']::before`,
+      `[class*=' ${useClassNamePrefix}${iconFont.fontName}-']::before`,
+      `[class^='${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}-']::before`,
+      `[class*=' ${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}-']::before`,
+      `[class^='${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}-']::after`,
+      `[class*=' ${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}-']::after`,
+    ]
+  });
   iconRule.append({
     prop: 'font-family',
     value: `'${iconFont.fontName}', sans-serif`
@@ -247,32 +253,24 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
   // append glyphs
   glyphs.forEach((glyph) => {
 
-    const {
-      classNamePrefix: prefix,
-      classNameBeforePrefix: beforePrefix,
-      classNameAfterPrefix: afterPrefix,
-      classNameFontSeparator: fontSeparator,
-      classNameGlyphSeparator: glyphSeparator
-    } = options;
+    [
+      {
+        prefix: useClassNamePrefix,
+        pseudo: 'before',
+      },
+      {
+        prefix: `${useClassNamePrefix}${useClassNamePrefixBefore}`,
+        pseudo: 'before',
+      },
+      {
+        prefix: `${useClassNamePrefix}${useClassNamePrefixAfter}`,
+        pseudo: 'after',
+      },
+    ].forEach((classNamingConvention) => {
 
-    const glyphSelectors = [`.${prefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::before`];
-
-    if (beforePrefix) {
-
-      glyphSelectors.push(`.${beforePrefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::before`);
-
-    }
-
-    if (afterPrefix) {
-
-      glyphSelectors.push(`.${afterPrefix}${fontSeparator}${iconFont.fontName}${glyphSeparator}${glyph.name}::after`);
-
-    }
-
-    glyphSelectors.forEach((selector) => {
-
-      const fontRule = postcss.rule({ selector });
-
+      const fontRule = postcss.rule({
+        selector: `.${classNamingConvention.prefix}${iconFont.fontName}-${glyph.name}::${classNamingConvention.pseudo}`,
+      });
       fontRule.append({
         prop: 'content',
         value: `'\\${glyph.codepoint.toString(16).toUpperCase()}'`
@@ -338,14 +336,48 @@ const processFontFace = (rulesets, options) => {
 
     });
 
-    // Set icon font hash
-    iconFont.fontHash = options.fixedHash || new Date().getTime().toString(16);
-
     // creates fonts
-    createFonts(iconFont, rulesets, options).then((glyphs) => {
+    createFonts(iconFont, rulesets, options).then((fontResult) => {
 
       // creates rulesets
-      glyphs && createWebFontRuleSets(iconFont, rulesets, glyphs, options);
+      if (fontResult) {
+
+        // Select cachebuster time option.
+        if (options.cachebuster !== null && options.cachebuster !== undefined) {
+
+          const useCachebuster = options.cachebuster.toString().toLowerCase();
+
+          // Select cachebuster option
+          switch (useCachebuster) {
+
+            // hash cachebuster
+            case 'hash':
+              iconFont.fontHash = fontResult.svgHash;
+              break;
+
+            // fixed cachebuster
+            case 'fixed':
+              iconFont.fontHash = options.cachebusterFixed;
+              break;
+
+            // Disable cachebuster
+            default:
+              iconFont.fontHash = null;
+              break;
+
+          }
+
+        } else {
+
+          // Disable cachebuster
+          iconFont.fontHash = null;
+
+        }
+
+        // creates rulesets
+        createWebFontRuleSets(iconFont, rulesets, fontResult.glyphs, options);
+
+      }
 
       // returns successful
       resolve();

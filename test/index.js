@@ -2,11 +2,11 @@
  * @file Testing plugin
  */
 
-const fs      = require('fs');
-const path    = require('path');
-const postcss = require('postcss');
-const test    = require('ava');
-const plugin  = require('..');
+const fs        = require('fs');
+const path      = require('path');
+const postcss   = require('postcss');
+const test      = require('ava');
+const plugin    = require('..');
 
 // Default PostCSS options
 const defaultPostCSSOptions = {
@@ -48,7 +48,8 @@ test('generate webfonts - case001', (t) => {
       publishPath: './test/expect',
       stylesheetPath: './css',
       outputPath: './test/expect/fonts',
-      fixedHash: 'test',
+      cachebuster: 'fixed',
+      cachebusterFixed: 'test',
     },
   ).then((result) => {
 
@@ -67,11 +68,122 @@ test('generate webfonts - case002', (t) => {
       publishPath: './test/expect',
       stylesheetPath: './css',
       outputPath: './test/expect/fonts',
-      fixedHash: 'test',
+      cachebuster: 'fixed',
+      cachebusterFixed: 'test',
     }
   ).then((result) => {
 
     t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case002.css'), 'UTF-8'));
+
+  });
+
+});
+
+test('generate webfonts - case003', (t) => {
+
+  return postcssProcess(
+    'fixtures/css/case003.css',
+    {
+      basePath: './test/fixtures',
+      publishPath: './test/expect',
+      stylesheetPath: './css',
+      outputPath: './test/expect/fonts',
+      cachebuster: 'fixed',
+      cachebusterFixed: 'test',
+      classNamePrefix: 'iconfontchange',
+    }
+  ).then((result) => {
+
+    t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case003.css'), 'UTF-8'));
+
+  });
+
+});
+
+test('generate webfonts - case004', (t) => {
+
+  return postcssProcess(
+    'fixtures/css/case004.css',
+    {
+      basePath: './test/fixtures',
+      publishPath: './test/expect',
+      stylesheetPath: './css',
+      outputPath: './test/expect/fonts',
+      cachebuster: 'fixed',
+      cachebusterFixed: 'test',
+      classNamePrefix: 'iconfontchange',
+      classNamePrefixBefore: 'beforechange',
+    }
+  ).then((result) => {
+
+    t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case004.css'), 'UTF-8'));
+
+  });
+
+});
+
+test('generate webfonts - case005', (t) => {
+
+  return postcssProcess(
+    'fixtures/css/case005.css',
+    {
+      basePath: './test/fixtures',
+      publishPath: './test/expect',
+      stylesheetPath: './css',
+      outputPath: './test/expect/fonts',
+      cachebuster: 'fixed',
+      cachebusterFixed: 'test',
+      classNamePrefix: 'iconfontchange',
+      classNamePrefixBefore: 'beforechange',
+      classNamePrefixAfter: 'afterchange',
+    }
+  ).then((result) => {
+
+    t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case005.css'), 'UTF-8'));
+
+  });
+
+});
+
+test('generate webfonts - case006', (t) => {
+
+  return postcssProcess(
+    'fixtures/css/case006.css',
+    {
+      basePath: './test/fixtures',
+      publishPath: './test/expect',
+      stylesheetPath: './css',
+      outputPath: './test/expect/fonts',
+      cachebuster: 'hash',
+      classNamePrefix: 'iconfontchange',
+      classNamePrefixBefore: 'beforechange',
+      classNamePrefixAfter: 'afterchange',
+    }
+  ).then((result) => {
+
+    t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case006.css'), 'UTF-8'));
+
+  });
+
+});
+
+test('generate webfonts - case007', (t) => {
+
+  return postcssProcess(
+    'fixtures/css/case007.css',
+    {
+      basePath: './test/fixtures',
+      publishPath: './test/expect',
+      stylesheetPath: './css',
+      outputPath: './test/expect/fonts',
+      cachebuster: null,
+      classNamePrefix: 'iconfontchange',
+      classNamePrefixBefore: 'beforechange',
+      classNamePrefixAfter: 'afterchange',
+    }
+  ).then((result) => {
+
+    t.is(result.css, fs.readFileSync(path.resolve(__dirname, 'expect/css/case007.css'), 'UTF-8'));
 
   });
 

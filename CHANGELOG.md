@@ -1,3 +1,23 @@
+# 3.0.0 (2019-07-21)
+
+### Added
+
+-   "cachebuster" and "cachebusterFixed" options.
+
+### Removed
+
+-   "fixedHash" option. Use "cachebusterFixed" option instead.
+
+# 2.3.0 (2019-07-20)
+
+### Added
+
+-   "prependUnicode", "classNamePrefix", "classNamePrefixBefore" and "classNameAfter" options.
+
+### Changed
+
+-   Upgrade versions of all dependencies.
+
 # 2.2.1 (2019-01-08)
 
 ### Fixed
