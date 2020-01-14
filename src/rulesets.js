@@ -200,12 +200,12 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
   // append base ruleset
   const iconRule = postcss.rule({
     selectors: [
-      `[class^='${useClassNamePrefix}${iconFont.fontName}-']::before`,
-      `[class*=' ${useClassNamePrefix}${iconFont.fontName}-']::before`,
-      `[class^='${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}-']::before`,
-      `[class*=' ${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}-']::before`,
-      `[class^='${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}-']::after`,
-      `[class*=' ${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}-']::after`,
+      `[class^='${useClassNamePrefix}${iconFont.fontName}']::before`,
+      `[class*=' ${useClassNamePrefix}${iconFont.fontName}']::before`,
+      `[class^='${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}']::before`,
+      `[class*=' ${useClassNamePrefix}${useClassNamePrefixBefore}${iconFont.fontName}']::before`,
+      `[class^='${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}']::after`,
+      `[class*=' ${useClassNamePrefix}${useClassNamePrefixAfter}${iconFont.fontName}']::after`,
     ]
   });
   iconRule.append({
@@ -252,24 +252,29 @@ const createWebFontRuleSets = (iconFont, rulesets, glyphs, options) => {
 
   // append glyphs
   glyphs.forEach((glyph) => {
-
-    [
-      {
+    const glyphSelectors = [];
+    if (useClassNamePrefix) {
+      glyphSelectors.push({
         prefix: useClassNamePrefix,
         pseudo: 'before',
-      },
-      {
+      });
+    }
+    if (useClassNamePrefixBefore) {
+      glyphSelectors.push({
         prefix: `${useClassNamePrefix}${useClassNamePrefixBefore}`,
         pseudo: 'before',
-      },
-      {
+      });
+    }
+    if (useClassNamePrefixAfter) {
+      glyphSelectors.push({
         prefix: `${useClassNamePrefix}${useClassNamePrefixAfter}`,
         pseudo: 'after',
-      },
-    ].forEach((classNamingConvention) => {
+      });
+    }
+    glyphSelectors.forEach((classNamingConvention) => {
 
       const fontRule = postcss.rule({
-        selector: `.${classNamingConvention.prefix}${iconFont.fontName}-${glyph.name}::${classNamingConvention.pseudo}`,
+        selector: `.${classNamingConvention.prefix}${iconFont.fontName}${options.classNameGlyphSeparator}${glyph.name}::${classNamingConvention.pseudo}`,
       });
       fontRule.append({
         prop: 'content',

@@ -19,6 +19,7 @@ const defaultOptions = {
   classNamePrefix: 'iconfont',
   classNamePrefixBefore: 'before',
   classNamePrefixAfter: 'after',
+  classNameGlyphSeparator: '-',
   cachebuster: 'hash',
   cachebusterFixed: '',
 
